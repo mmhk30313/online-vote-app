@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "online-voting-client"
+		},
+		{
+			"path": "online-voting-server"
+		},
+		{
+			"path": "../../../my_university_project/KeepTouchServer"
+		},
+		{
+			"path": "../../../Indian Works/lws/redux-learn-with-sumit"
+		},
+		{
+			"path": "../../../my_university_project/KeepTouch"
+		}
+	],
+	"settings": {}
+}
