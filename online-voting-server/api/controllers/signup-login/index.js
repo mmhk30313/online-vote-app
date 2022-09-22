@@ -11,18 +11,18 @@ const UserRole = require("../../models/User/UserRole");
 const uploadFile = require('../all_global_controllers/upload');
 const development_mode = process.env.NODE_ENV === 'development';
 console.log({development_mode});
-const smtpTransport = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.VERIFIER_EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-    }
-});
+// const smtpTransport = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//         user: process.env.VERIFIER_EMAIL,
+//         pass: process.env.EMAIL_PASSWORD,
+//     }
+// });
 
 // User login for getting token
 exports.login_user = async (req, res) => {
-    const {email, password, user_id} = req?.body;
-    console.log({email, user_id, password});
+    const {email, password, user_id, user_role} = req?.body;
+    console.log({email, user_id, password, user_role});
     
     if((!user_id && !email) || !password) {
         return res.status(406).json({
@@ -54,12 +54,13 @@ exports.login_user = async (req, res) => {
                     avatar: 1,
                     role_id: 1,
                     user_id: 1,
+                    voting_status: 1,
                     user_role: 1,
+                    group_id: 1,
+                    election_id: 1,
                     isVerified: 1,
                     address: 1,
                     gender: 1,
-                    lat: 1,
-                    lan: 1,
                     role: { $arrayElemAt: [ "$role.name", 0 ] },
                 }
             }
@@ -70,7 +71,13 @@ exports.login_user = async (req, res) => {
         console.log({user: user});
         
         if(!user) {
-            return res.status(404).json({status: false, message: "User not found"});
+            return res.status(404).json({status: false, message: "User not found!"});
+        }
+        if(user_role === "admin" && user?.user_role !== user_role) {
+            return res.status(403).
+            json({
+                status: false, message: "User role is not matched! you are not allowed to login as admin"
+            });
         }
         // if(!user?.isVerified){
         //     return res.status(400).json({
@@ -82,7 +89,7 @@ exports.login_user = async (req, res) => {
         if(!validPassword) {
             return res.status(400).json({status: false, message: "Wrong password"});
         }
-        const tokenObject = {email: user?.email, name: user?.user_name, user_role: user?.user_role, avatar: user?.avatar};
+        const tokenObject = {email: user?.email, name: user?.user_name, group_id: user?.group_id, election_id: user?.election_id, user_role: user?.user_role, avatar: user?.avatar};
         const accessToken = jwt.sign(tokenObject, accessTokenSecret);
         delete user.password;
         const dataObj = {
@@ -92,7 +99,19 @@ exports.login_user = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "User is logged in successfully!!!",
-            data: {user: {email: user?.email, name: user?.user_name, user_role: user?.user_role, avatar: user?.avatar}, accessToken}
+            data: {
+                user: {
+                    email: user?.email, 
+                    name: user?.user_name,
+                    user_id: user?.user_id,
+                    group_id: user?.group_id, 
+                    election_id: user?.election_id,
+                    voting_status: user?.voting_status, 
+                    user_role: user?.user_role, 
+                    avatar: user?.avatar
+                }, 
+                accessToken
+            }
         })
         
     } catch (error) {
@@ -169,7 +188,7 @@ exports.sign_up_user = async (req, res) => {
                     await User.updateOne({email}, dataObj);
                     return res.status(200).json({
                         status: true,
-                        message: "The user is successfully signed up. Please check your email for the verification code",
+                        message: "The user is successfully registered!!!",
                         data: {user: {email: user?.email, name: user?.user_name, user_role: user?.user_role, avatar: user?.avatar}, accessToken},
                     });
                 }
@@ -190,27 +209,24 @@ exports.sign_up_user = async (req, res) => {
 
 // User logout for removing token from db
 exports.logout_user = async(req, res, next) => {
-    await authenticateJWT(req, res);
-    if(req?.auth){
-        const {token, user, remember_token} = req;
-        try {
-            // const filter_tokens = await remember_token?.filter(t => t != token);
-            await User.updateOne({email: user?.email}, {remember_token: "", is_active: false});
-            return res.status(200).json({
-                status: true,
-                message: "User is logged out successfully!!!",
-            })
-            
-        } catch (error) {
-            return res.json({
-                status: false,
-                message: error?.message || "Server error",
-            })
-        }
-    }else{
-        const err = new Error("User is not logged in");
-        err.status = 401;
-        return next(err);
+    const {
+        user, 
+        // token, 
+        // remember_token
+    } = req;
+    try {
+        // const filter_tokens = await remember_token?.filter(t => t != token);
+        await User.updateOne({email: user?.email}, {remember_token: "", is_active: false});
+        return res.status(200).json({
+            status: true,
+            message: "User is logged out successfully!!!",
+        })
+        
+    } catch (error) {
+        return res.json({
+            status: false,
+            message: error?.message || "Server error",
+        })
     }
 };
 

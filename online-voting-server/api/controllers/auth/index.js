@@ -18,9 +18,9 @@ const authenticateJWT = async(req, res) => {
     if (authHeader) {
         const token = authHeader.split(' ')[1];
         try {
-            console.log("====Token====", token);
+            // console.log("====Token====", token);
             const user_res = await User.findOne({remember_token: token}).select('-password');
-            console.log("====User====", user_res);
+            // console.log("====User====", user_res);
             if(!user_res){
                 setUnauthorized();
             }else{
@@ -34,16 +34,18 @@ const authenticateJWT = async(req, res) => {
                         });
                     }
                     req.user = user;
-                    req.user_details = user_res;
                     req.auth = true;
                     req.token = token;
                     req.remember_token = remember_token;
+                    delete user_res.remember_token;
+                    req.user_details = user_res;
                     // console.log({user: user});
                     // console.log("====Token====", token);
                 });
-    
+                // next();
             }
         } catch (error) {
+            console.log({error});
             setUnauthorized();
         }
             

@@ -37,14 +37,6 @@ const UserSchema = new mongoose.Schema(
         length: 10,
         default: ""
     },
-    designation: {
-        type: String,
-        max: 18,
-        length: 18,
-    },
-    description: {
-        type: String,
-    },
     avatar: {
         type: String,
         default: ""
@@ -63,17 +55,25 @@ const UserSchema = new mongoose.Schema(
         max: 14,
         default: ""
     },
-    isVerified: {
-        type: Boolean,
-        default: false,
-    },
-    email_verified_at: {
+    // group id
+    group_id: {
         type: String,
         default: ""
     },
-    is_active: {
+    // Vote dile update hobe but candidate khetre create er time update hobe
+    election_id: {
+        type: String,
+        max: 14,
+        default: ""
+    },
+    // Vote dile update hobe
+    voting_status: {
         type: Boolean,
         default: false
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
     },
     remember_token: {
         type: String,

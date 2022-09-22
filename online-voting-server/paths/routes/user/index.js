@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { user_update_by_user, find_all_users, delete_user, find_user_by_email, find_user_details, make_admin } = require("../../../api/controllers/user");
+const { find_all_users, delete_user, find_user_by_email, find_user_details, make_admin, update_user } = require("../../../api/controllers/user");
 // const user_role_enum = require("../../enums/user_role_enum");
 
 // User update only for user
-router.post('/user/update', user_update_by_user);
+router.patch('/users/:email', update_user);
 
 // Get all users only for admin
-router.get('/user/all', find_all_users);
+router.get('/users', find_all_users);
 
 // find a user details by user email
 router.get('/user/find-one', find_user_by_email);
@@ -21,6 +21,8 @@ router.post('/user-make/admin', make_admin);
 
 // User delete only for admin
 router.delete('/user/delete', delete_user);
+
+// Create user election
 
 // User role create only for admin
 // router.post('/user-role/create', async(req, res) => {

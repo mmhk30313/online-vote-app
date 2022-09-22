@@ -14,8 +14,9 @@ let dbURI;
 let uri;
 let isLive = false;
 let dbNameLocal = 'OnlineVotingSystem';
-let dbNameLive = 'online_voting_system';
-let dbUserNameLive = 'online_voting_system';
+let dbNameLive = 'ONLINE_VOTING_SYSTEM';
+let dbUserNameLive = 'ONLINE-VOTING-SYSTEM';
+let dbPasswordLive = 'ONLINE-VOTING-SYSTEM';
 
 if (process.env.NODE_ENV === "development") {
   
@@ -31,6 +32,15 @@ if (process.env.NODE_ENV === "development") {
   // Local Config
   dbURI = `mongodb://localhost:27017/${dbNameLocal}`;
   uri = "localhost://27017";
+
+} else {
+
+  isLive = true;
+
+  // dbURI = `mongodb://user_mobipath:Mobipath#123@153.92.4.251:27010/${dbNameLive}`;
+  dbURI = `mongodb+srv://${dbUserNameLive}:${dbPasswordLive}@cluster0.7vieyi4.mongodb.net/${dbNameLive}?retryWrites=true&w=majority`;
+  // dbURI = `mongodb+srv://${dbUserNameLive}:mmhk$30313@cluster0.h3rvg.mongodb.net/${dbNameLive}?retryWrites=true&w=majority`;
+  uri = "Prod-Connection-Mongodb-Cluod ------ > mmhk.itsforyou@gmail.com";
 
 }
 
